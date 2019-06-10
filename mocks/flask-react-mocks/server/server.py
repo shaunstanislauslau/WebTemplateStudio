@@ -54,5 +54,17 @@ def getMasterDetail():
         sampleGridData
     )
 
+# Catching all routes
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return 'You want path: %s' % path
+
+# Error Handler
+@app.errorhandler(404)
+def page_not_found(error):
+	app.logger.error('Page not found: %s', (request.path))
+	return make_response(jsonify({'error': '404: No Page Found'}), 404)
+
 if __name__ == '__main__':
    app.run(debug=True, port=CONSTANTS['PORT'])
