@@ -196,6 +196,72 @@ const PostGenerationModal = ({
     });
   };
 
+  const ser: any = {cosmosdb:{title:{id:"Cosmos DB",defaultMessage:"Cosmos DB"},isSelected:true,isDeployed:false,isFailed:false},azureFunctions:{title:{id:"Azure Functions",defaultMessage:"Azure Functions"},isSelected:true,isDeployed:true,isFailed:false},appService:{title:{id:"App Service",defaultMessage:"App Service"},isSelected:true,isDeployed:false,isFailed:true}};
+  
+  const renderServiceErrorTEST = () => {
+    if(isTemplatesFailed){
+      return(
+      <div className={styles.sectionLine}>
+        {isServicesSelected && formatMessage(messages.deploymentHalted)}
+      </div>
+      );
+    }
+    return Object.keys(ser).map((service: string, idx: number) => {
+    const serviceTitle = formatMessage(ser[service].title);
+      if (ser[service].isSelected && ser[service].isFailed) {
+        return (
+          <div className={styles.sectionLine}
+            key={`${messages.error.defaultMessage}${idx}`}
+          >{`${formatMessage(messages.error)} ${serviceTitle} ${formatMessage(
+            messages.deploymentFailure
+          )}`}</div>
+        );
+      }
+    });
+  };
+
+  const renderServiceCheckmarkTEST = ()=>{
+    return Object.keys(ser).map((service: string, idx: number) => {
+      const serviceTitle = formatMessage(ser[service].title);
+        if (ser[service].isSelected) {
+          if (ser[service].isFailed) {
+            return (
+              <div className={styles.checkmarkStatusRow} key={`${messages.isDeploying.defaultMessage}${idx}`}>
+              <React.Fragment>
+                <div>{serviceTitle}</div>
+                <div><ErrorRed className={styles.iconError} /></div>
+              </React.Fragment>
+            </div>
+            );
+          }
+          if (ser[service].isDeployed) {
+            return (
+              <div className={styles.checkmarkStatusRow}>
+                <div>{serviceTitle}</div>
+                <div className={styles.inLine}>
+                  <ReactMarkdown
+                    source={`${links[serviceTitle]}`}
+                    key={`${messages.deploymentSuccess.defaultMessage}${idx}`}
+                    renderers={{ link: LinkRenderer }} />
+                  <div role="img" aria-label="Azure Service Deploy done">
+                    <Checkmark className={styles.iconCheck} />
+                  </div>
+                </div>
+              </div >
+            );
+          }
+          return (
+            <div className={styles.checkmarkStatusRow} key={`${messages.isDeploying.defaultMessage}${idx}`}>
+              <React.Fragment>
+                <div>{serviceTitle}</div>
+                <div><Spinner className={styles.spinner} /></div>
+              </React.Fragment>
+            </div>
+          );
+        }
+      });
+  }
+
   const renderServiceCheckmark = () => {
     if(isTemplatesFailed){
       return Object.keys(serviceStatus).map((service: string, idx: number) => {
@@ -263,13 +329,13 @@ const PostGenerationModal = ({
         {templateGenerationInProgress && (<div className={styles.sectionLine}>{templateGenStatus}</div>)}
         {templateGenerated && postGenMessage()}
         {isTemplatesFailed && renderTemplatesError()}
-        {isServicesSelected && renderServiceError()}
+        {isServicesSelected && renderServiceErrorTEST()}
       </div>
 
       <div className={classnames(styles.section, styles.checkmarkSection)}>
         <div className={styles.containerWithMargin}>
           {renderTemplatesCheckmark()}
-          {isServicesSelected && renderServiceCheckmark()}
+          {isServicesSelected && renderServiceCheckmarkTEST()}
         </div>
       </div>
 
