@@ -78,8 +78,8 @@ const PostGenerationModal = ({
   history
 }: Props) => {
   const { formatMessage } = intl;
-  const templateGenerated = isTemplateGenerated && !isTemplatesFailed;
-  const templateGenerationInProgress = !isTemplateGenerated && !isTemplatesFailed;
+  const templateGenerated = isTemplateGenerated && !true;
+  const templateGenerationInProgress = !isTemplateGenerated && !true;
 
   const LinkRenderer = (props: any) => (
     <a href={props.href} className={styles.link} onKeyUp={keyUpHandler}>
@@ -94,7 +94,7 @@ const PostGenerationModal = ({
   };
 
   const handleOpenProjectOrRestartWizard = () => {
-    if (isTemplatesFailed) {
+    if (true) {
       resetWizard();
       history.push(ROUTES.NEW_PROJECT);
       return;
@@ -111,7 +111,7 @@ const PostGenerationModal = ({
     }
   };
   const openProjectOrRestartWizardMessage = () => {
-    if (isTemplatesFailed) {
+    if (true) {
       return formatMessage(messages.restartWizard);
     }
     return formatMessage(messages.openInCode);
@@ -168,12 +168,13 @@ const PostGenerationModal = ({
         <div>{formatMessage(messages.projectCreation)}</div>
         {(templateGenerationInProgress &&  (<div><Spinner className={styles.spinner} /></div>)) || (templateGenerated && (<div role="img" aria-label="project creation done">
           <Checkmark className={styles.iconCheck} /></div>))}
-          {isTemplatesFailed && (<div><ErrorRed className={styles.iconError} /></div>)}
+          {true && (<div><ErrorRed className={styles.iconError} /></div>)}
       </React.Fragment>
     </div>
     );
   }
 
+  const ser: any = {cosmosdb:{title:{id:"Cosmos DB",defaultMessage:"Cosmos DB"},isSelected:true,isDeployed:false,isFailed:false},azureFunctions:{title:{id:"Azure Functions",defaultMessage:"Azure Functions"},isSelected:true,isDeployed:true,isFailed:false},appService:{title:{id:"App Service",defaultMessage:"App Service"},isSelected:true,isDeployed:false,isFailed:true}};
   const renderServiceError = () => {
     if(isTemplatesFailed){
       return(
@@ -195,6 +196,84 @@ const PostGenerationModal = ({
       }
     });
   };
+  const renderServiceErrorTEST = () => {
+    if(true){
+      return(
+      <div className={styles.sectionLine}>
+        {isServicesSelected && formatMessage(messages.deploymentHalted)}
+      </div>
+      );
+    }
+    return Object.keys(ser).map((service: string, idx: number) => {
+    const serviceTitle = formatMessage(ser[service].title);
+      if (ser[service].isSelected && ser[service].isFailed) {
+        return (
+          <div className={styles.sectionLine}
+            key={`${messages.error.defaultMessage}${idx}`}
+          >{`${formatMessage(messages.error)} ${serviceTitle} ${formatMessage(
+            messages.deploymentFailure
+          )}`}</div>
+        );
+      }
+    });
+  };
+
+  const renderServiceCheckmarkTEST = ()=>{
+    if(true){
+      return Object.keys(ser).map((service: string, idx: number) => {
+        const serviceTitle = formatMessage(ser[service].title);
+          if (ser[service].isSelected) {
+              return (
+                <div className={styles.checkmarkStatusRow} key={`${messages.isDeploying.defaultMessage}${idx}`}>
+                <React.Fragment>
+                  <div>{serviceTitle}</div>
+                  <div><ErrorRed className={styles.iconError} /></div>
+                </React.Fragment>
+              </div>
+              );
+            }
+        });
+    }
+    return Object.keys(ser).map((service: string, idx: number) => {
+      const serviceTitle = formatMessage(ser[service].title);
+        if (ser[service].isSelected) {
+          if (ser[service].isFailed) {
+            return (
+              <div className={styles.checkmarkStatusRow} key={`${messages.isDeploying.defaultMessage}${idx}`}>
+              <React.Fragment>
+                <div>{serviceTitle}</div>
+                <div><ErrorRed className={styles.iconError} /></div>
+              </React.Fragment>
+            </div>
+            );
+          }
+          if (ser[service].isDeployed) {
+            return (
+              <div className={styles.checkmarkStatusRow}>
+                <div>{serviceTitle}</div>
+                <div className={styles.inLine}>
+                  <ReactMarkdown
+                    source={`${links[serviceTitle]}`}
+                    key={`${messages.deploymentSuccess.defaultMessage}${idx}`}
+                    renderers={{ link: LinkRenderer }} />
+                  <div role="img" aria-label="Azure Service Deploy done">
+                    <Checkmark className={styles.iconCheck} />
+                  </div>
+                </div>
+              </div >
+            );
+          }
+          return (
+            <div className={styles.checkmarkStatusRow} key={`${messages.isDeploying.defaultMessage}${idx}`}>
+              <React.Fragment>
+                <div>{serviceTitle}</div>
+                <div><Spinner className={styles.spinner} /></div>
+              </React.Fragment>
+            </div>
+          );
+        }
+      });
+  }
 
   const renderServiceCheckmark = () => {
     if(isTemplatesFailed){
@@ -262,19 +341,19 @@ const PostGenerationModal = ({
       <div className={styles.section}>
         {templateGenerationInProgress && (<div className={styles.sectionLine}>{templateGenStatus}</div>)}
         {templateGenerated && postGenMessage()}
-        {isTemplatesFailed && renderTemplatesError()}
-        {isServicesSelected && renderServiceError()}
+        {true && renderTemplatesError()}
+        {isServicesSelected && renderServiceErrorTEST()}
       </div>
 
       <div className={classnames(styles.section, styles.checkmarkSection)}>
         <div className={styles.containerWithMargin}>
           {renderTemplatesCheckmark()}
-          {isServicesSelected && renderServiceCheckmark()}
+          {isServicesSelected && renderServiceCheckmarkTEST()}
         </div>
       </div>
 
       <div className={styles.footerContainer}>
-        {isTemplatesFailed &&
+        {true &&
           (<a className={styles.link}
             href={WEB_TEMPLATE_STUDIO_LINKS.ISSUES}
             onKeyUp={keyUpHandler}>
