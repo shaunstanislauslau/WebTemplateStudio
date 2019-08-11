@@ -11,23 +11,23 @@ export function activate(context: ExtensionContext) {
       }
     )
   );
-  context.subscriptions.push(
-    commands.registerCommand(
-      "webTemplateStudioExtension.openReadme",
-      async () => {
-        const workspaceInfo = workspace.workspaceFolders;
-        if (workspaceInfo) {
-          const settingsPath = path.join(
-            workspaceInfo[0].uri.fsPath,
-            "README.md"
-          );
-          const doc = await workspace.openTextDocument(Uri.file(settingsPath));
-          await window.showTextDocument(doc);
-          commands.executeCommand("markdown.showPreview");
-        }
+
+  const readme = commands.registerCommand(
+    "webTemplateStudioExtension.openReadme",
+    async () => {
+      const workspaceInfo = workspace.workspaceFolders;
+      if (workspaceInfo) {
+        const settingsPath = path.join(
+          workspaceInfo[0].uri.fsPath,
+          "README.md"
+        );
+        const doc = await workspace.openTextDocument(Uri.file(settingsPath));
+        await window.showTextDocument(doc, { preview: false });
+        commands.executeCommand("markdown.showPreview", Uri.file(settingsPath));
       }
-    )
+    }
   );
+  context.subscriptions.push(readme);
 }
 
 export function deactivate() {
