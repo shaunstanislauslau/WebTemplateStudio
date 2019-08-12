@@ -17,13 +17,10 @@ export function activate(context: ExtensionContext) {
     async () => {
       const workspaceInfo = workspace.workspaceFolders;
       if (workspaceInfo) {
-        const settingsPath = path.join(
-          workspaceInfo[0].uri.fsPath,
-          "README.md"
-        );
-        const doc = await workspace.openTextDocument(Uri.file(settingsPath));
+        const readmePath = path.join(workspaceInfo[0].uri.fsPath, "README.md");
+        const doc = await workspace.openTextDocument(Uri.file(readmePath));
         await window.showTextDocument(doc, { preview: false });
-        commands.executeCommand("markdown.showPreview", Uri.file(settingsPath));
+        commands.executeCommand("markdown.showPreview", Uri.file(readmePath));
       }
     }
   );
