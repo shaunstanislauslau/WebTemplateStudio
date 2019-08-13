@@ -78,8 +78,10 @@ const PostGenerationModal = ({
   history
 }: Props) => {
   const { formatMessage } = intl;
+  let serviceFailed = false;
   const templateGenerated = isTemplateGenerated && !isTemplatesFailed;
-  const templateGenerationInProgress = !isTemplateGenerated && !isTemplatesFailed;
+  const templateGenerationInProgress =
+    !isTemplateGenerated && !isTemplatesFailed;
 
   const LinkRenderer = (props: any) => (
     <a href={props.href} className={styles.link} onKeyUp={keyUpHandler}>
@@ -151,42 +153,59 @@ const PostGenerationModal = ({
         </div>
       );
     }
-  }
+  };
 
-  const renderTemplatesError = () =>{
-    return(
+  const renderTemplatesError = () => {
+    return (
       <div className={styles.sectionLine}>
-      {formatMessage(messages.failedToGenerate)}
-    </div>
+        {formatMessage(messages.failedToGenerate)}
+      </div>
     );
-  }
+  };
 
-  const renderTemplatesCheckmark = () =>{
-    return(
+  const renderTemplatesCheckmark = () => {
+    return (
       <div className={styles.checkmarkStatusRow}>
-      <React.Fragment>
-        <div>{formatMessage(messages.projectCreation)}</div>
-        {(templateGenerationInProgress &&  (<div><Spinner className={styles.spinner} /></div>)) || (templateGenerated && (<div role="img" aria-label="project creation done">
-          <Checkmark className={styles.iconCheck} /></div>))}
-          {isTemplatesFailed && (<div><ErrorRed className={styles.iconError} /></div>)}
-      </React.Fragment>
-    </div>
+        <React.Fragment>
+          <div>{formatMessage(messages.projectCreation)}</div>
+          {(templateGenerationInProgress && (
+            <div>
+              <Spinner className={styles.spinner} />
+            </div>
+          )) ||
+            (templateGenerated && (
+              <div role="img" aria-label="project creation done">
+                <Checkmark className={styles.iconCheck} />
+              </div>
+            ))}
+          {isTemplatesFailed && (
+            <div>
+              <ErrorRed className={styles.iconError} />
+            </div>
+          )}
+        </React.Fragment>
+      </div>
     );
-  }
+  };
 
   const renderServiceError = () => {
-    if(isTemplatesFailed){
-      return(
-      <div className={styles.sectionLine}>
-        {isServicesSelected && formatMessage(messages.deploymentHalted)}
-      </div>
+    if (isTemplatesFailed) {
+      return (
+        <div className={styles.sectionLine}>
+          {isServicesSelected && formatMessage(messages.deploymentHalted)}
+        </div>
       );
     }
     return Object.keys(serviceStatus).map((service: string, idx: number) => {
-    const serviceTitle = formatMessage(serviceStatus[service].title);
-      if (serviceStatus[service].isSelected && serviceStatus[service].isFailed) {
+      serviceFailed = true;
+      const serviceTitle = formatMessage(serviceStatus[service].title);
+      if (
+        serviceStatus[service].isSelected &&
+        serviceStatus[service].isFailed
+      ) {
         return (
-          <div className={styles.sectionLine}
+          <div
+            className={styles.sectionLine}
             key={`${messages.error.defaultMessage}${idx}`}
           >{`${formatMessage(messages.error)} ${serviceTitle} ${formatMessage(
             messages.deploymentFailure
@@ -196,21 +215,42 @@ const PostGenerationModal = ({
     });
   };
 
-  const ser: any = {cosmosdb:{title:{id:"Cosmos DB",defaultMessage:"Cosmos DB"},isSelected:true,isDeployed:false,isFailed:false},azureFunctions:{title:{id:"Azure Functions",defaultMessage:"Azure Functions"},isSelected:true,isDeployed:true,isFailed:false},appService:{title:{id:"App Service",defaultMessage:"App Service"},isSelected:true,isDeployed:false,isFailed:true}};
-  
+  const ser: any = {
+    cosmosdb: {
+      title: { id: "Cosmos DB", defaultMessage: "Cosmos DB" },
+      isSelected: true,
+      isDeployed: false,
+      isFailed: false
+    },
+    azureFunctions: {
+      title: { id: "Azure Functions", defaultMessage: "Azure Functions" },
+      isSelected: true,
+      isDeployed: true,
+      isFailed: false
+    },
+    appService: {
+      title: { id: "App Service", defaultMessage: "App Service" },
+      isSelected: true,
+      isDeployed: false,
+      isFailed: true
+    }
+  };
+
   const renderServiceErrorTEST = () => {
-    if(isTemplatesFailed){
-      return(
-      <div className={styles.sectionLine}>
-        {isServicesSelected && formatMessage(messages.deploymentHalted)}
-      </div>
+    if (isTemplatesFailed) {
+      return (
+        <div className={styles.sectionLine}>
+          {isServicesSelected && formatMessage(messages.deploymentHalted)}
+        </div>
       );
     }
     return Object.keys(ser).map((service: string, idx: number) => {
-    const serviceTitle = formatMessage(ser[service].title);
+      const serviceTitle = formatMessage(ser[service].title);
       if (ser[service].isSelected && ser[service].isFailed) {
+        serviceFailed = true;
         return (
-          <div className={styles.sectionLine}
+          <div
+            className={styles.sectionLine}
             key={`${messages.error.defaultMessage}${idx}`}
           >{`${formatMessage(messages.error)} ${serviceTitle} ${formatMessage(
             messages.deploymentFailure
@@ -220,75 +260,96 @@ const PostGenerationModal = ({
     });
   };
 
-  const renderServiceCheckmarkTEST = ()=>{
+  const renderServiceCheckmarkTEST = () => {
     return Object.keys(ser).map((service: string, idx: number) => {
       const serviceTitle = formatMessage(ser[service].title);
-        if (ser[service].isSelected) {
-          if (ser[service].isFailed) {
-            return (
-              <div className={styles.checkmarkStatusRow} key={`${messages.isDeploying.defaultMessage}${idx}`}>
+      if (ser[service].isSelected) {
+        if (ser[service].isFailed) {
+          return (
+            <div
+              className={styles.checkmarkStatusRow}
+              key={`${messages.isDeploying.defaultMessage}${idx}`}
+            >
               <React.Fragment>
                 <div>{serviceTitle}</div>
-                <div><ErrorRed className={styles.iconError} /></div>
+                <div>
+                  <ErrorRed className={styles.iconError} />
+                </div>
               </React.Fragment>
             </div>
-            );
-          }
-          if (ser[service].isDeployed) {
-            return (
-              <div className={styles.checkmarkStatusRow}>
-                <div>{serviceTitle}</div>
-                <div className={styles.inLine}>
-                  <ReactMarkdown
-                    source={`${links[serviceTitle]}`}
-                    key={`${messages.deploymentSuccess.defaultMessage}${idx}`}
-                    renderers={{ link: LinkRenderer }} />
-                  <div role="img" aria-label="Azure Service Deploy done">
-                    <Checkmark className={styles.iconCheck} />
-                  </div>
-                </div>
-              </div >
-            );
-          }
+          );
+        }
+        if (ser[service].isDeployed) {
           return (
-            <div className={styles.checkmarkStatusRow} key={`${messages.isDeploying.defaultMessage}${idx}`}>
+            <div className={styles.checkmarkStatusRow}>
+              <div>{serviceTitle}</div>
+              <div className={styles.inLine}>
+                <ReactMarkdown
+                  source={`${links[serviceTitle]}`}
+                  key={`${messages.deploymentSuccess.defaultMessage}${idx}`}
+                  renderers={{ link: LinkRenderer }}
+                />
+                <div role="img" aria-label="Azure Service Deploy done">
+                  <Checkmark className={styles.iconCheck} />
+                </div>
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div
+            className={styles.checkmarkStatusRow}
+            key={`${messages.isDeploying.defaultMessage}${idx}`}
+          >
+            <React.Fragment>
+              <div>{serviceTitle}</div>
+              <div>
+                <Spinner className={styles.spinner} />
+              </div>
+            </React.Fragment>
+          </div>
+        );
+      }
+    });
+  };
+
+  const renderServiceCheckmark = () => {
+    if (isTemplatesFailed) {
+      return Object.keys(serviceStatus).map((service: string, idx: number) => {
+        const serviceTitle = formatMessage(serviceStatus[service].title);
+        if (serviceStatus[service].isSelected) {
+          return (
+            <div
+              className={styles.checkmarkStatusRow}
+              key={`${messages.isDeploying.defaultMessage}${idx}`}
+            >
               <React.Fragment>
                 <div>{serviceTitle}</div>
-                <div><Spinner className={styles.spinner} /></div>
+                <div>
+                  <ErrorRed className={styles.iconError} />
+                </div>
               </React.Fragment>
             </div>
           );
         }
       });
-  }
-
-  const renderServiceCheckmark = () => {
-    if(isTemplatesFailed){
-      return Object.keys(serviceStatus).map((service: string, idx: number) => {
-        const serviceTitle = formatMessage(serviceStatus[service].title);
-          if (serviceStatus[service].isSelected) {
-              return (
-                <div className={styles.checkmarkStatusRow} key={`${messages.isDeploying.defaultMessage}${idx}`}>
-                <React.Fragment>
-                  <div>{serviceTitle}</div>
-                  <div><ErrorRed className={styles.iconError} /></div>
-                </React.Fragment>
-              </div>
-              );
-            }
-        });
     }
     return Object.keys(serviceStatus).map((service: string, idx: number) => {
-    const serviceTitle = formatMessage(serviceStatus[service].title);
+      const serviceTitle = formatMessage(serviceStatus[service].title);
       if (serviceStatus[service].isSelected) {
         if (serviceStatus[service].isFailed) {
           return (
-            <div className={styles.checkmarkStatusRow} key={`${messages.isDeploying.defaultMessage}${idx}`}>
-            <React.Fragment>
-              <div>{serviceTitle}</div>
-              <div><ErrorRed className={styles.iconError} /></div>
-            </React.Fragment>
-          </div>
+            <div
+              className={styles.checkmarkStatusRow}
+              key={`${messages.isDeploying.defaultMessage}${idx}`}
+            >
+              <React.Fragment>
+                <div>{serviceTitle}</div>
+                <div>
+                  <ErrorRed className={styles.iconError} />
+                </div>
+              </React.Fragment>
+            </div>
           );
         }
         if (serviceStatus[service].isDeployed) {
@@ -299,19 +360,25 @@ const PostGenerationModal = ({
                 <ReactMarkdown
                   source={`${links[serviceTitle]}`}
                   key={`${messages.deploymentSuccess.defaultMessage}${idx}`}
-                  renderers={{ link: LinkRenderer }} />
+                  renderers={{ link: LinkRenderer }}
+                />
                 <div role="img" aria-label="Azure Service Deploy done">
                   <Checkmark className={styles.iconCheck} />
                 </div>
               </div>
-            </div >
+            </div>
           );
         }
         return (
-          <div className={styles.checkmarkStatusRow} key={`${messages.isDeploying.defaultMessage}${idx}`}>
+          <div
+            className={styles.checkmarkStatusRow}
+            key={`${messages.isDeploying.defaultMessage}${idx}`}
+          >
             <React.Fragment>
               <div>{serviceTitle}</div>
-              <div><Spinner className={styles.spinner} /></div>
+              <div>
+                <Spinner className={styles.spinner} />
+              </div>
             </React.Fragment>
           </div>
         );
@@ -326,7 +393,9 @@ const PostGenerationModal = ({
       </div>
 
       <div className={styles.section}>
-        {templateGenerationInProgress && (<div className={styles.sectionLine}>{templateGenStatus}</div>)}
+        {templateGenerationInProgress && (
+          <div className={styles.sectionLine}>{templateGenStatus}</div>
+        )}
         {templateGenerated && postGenMessage()}
         {isTemplatesFailed && renderTemplatesError()}
         {isServicesSelected && renderServiceErrorTEST()}
@@ -340,20 +409,24 @@ const PostGenerationModal = ({
       </div>
 
       <div className={styles.footerContainer}>
-        {isTemplatesFailed &&
-          (<a className={styles.link}
+        {(isTemplatesFailed || serviceFailed) && (
+          <a
+            className={styles.link}
             href={WEB_TEMPLATE_STUDIO_LINKS.ISSUES}
-            onKeyUp={keyUpHandler}>
+            onKeyUp={keyUpHandler}
+          >
             {formatMessage(messages.help)}
-          </a>)
-        }
+          </a>
+        )}
 
         {templateGenerated && isServicesDeployed && (
-          <button className={classnames(styles.button, buttonStyles.buttonDark)}
-            onClick={handleCreateAnotherProject}>
+          <button
+            className={classnames(styles.button, buttonStyles.buttonDark)}
+            onClick={handleCreateAnotherProject}
+          >
             {formatMessage(messages.createAnotherProject)}
-          </button>)
-        }
+          </button>
+        )}
 
         <button
           className={classnames(styles.button, {
