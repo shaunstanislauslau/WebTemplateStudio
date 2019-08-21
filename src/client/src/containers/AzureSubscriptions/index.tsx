@@ -35,6 +35,7 @@ interface IDispatchProps {
   setDetailPage: (detailPageInfo: IOption) => void;
   openAzureFunctionsModal: () => any;
   openAppServiceModal: () => any;
+  openAzureLoginModal: () => any;
 }
 
 interface IAzureLoginProps {
@@ -140,7 +141,7 @@ class AzureSubscriptions extends React.Component<Props, IState> {
     if (modalOpeners.hasOwnProperty(internalName)) {
       return modalOpeners[internalName];
     }
-    return () => {};
+    return () => { };
   }
 
   /**
@@ -167,6 +168,7 @@ class AzureSubscriptions extends React.Component<Props, IState> {
     subtitle?: FormattedMessage.MessageDescriptor
   ) {
     const { formatMessage } = this.props.intl;
+    const { openAzureLoginModal } = this.props;
     const createdHostingServiceInternalName = this.getCreatedHostingService();
 
     return (
@@ -188,20 +190,8 @@ class AzureSubscriptions extends React.Component<Props, IState> {
               // show cards with preview flag only if wizard is also in preview
               const shouldShowCard = isPreview || !option.isPreview;
               if (shouldShowCard && option.type === type) {
-                let isCardDisabled: boolean = !isLoggedIn;
 
-                switch (option.type) {
-                  case servicesEnum.HOSTING:
-                    // if a hosting service is already created, any other hosting services card should be disabled
-                    if (createdHostingServiceInternalName) {
-                      isCardDisabled =
-                        option.internalName !==
-                        createdHostingServiceInternalName;
-                    }
-                    break;
-                  default:
-                    break;
-                }
+
 
                 return (
                   <div
@@ -215,10 +205,9 @@ class AzureSubscriptions extends React.Component<Props, IState> {
                       buttonText={this.addOrEditResourceText(
                         option.internalName
                       )}
-                      handleButtonClick={this.getServicesModalOpener(
-                        option.internalName
-                      )}
-                      disabled={isCardDisabled}
+                      handleButtonClick={(isLoggedIn ? this.getServicesModalOpener(
+                        option.internalName) : openAzureLoginModal)
+                      }
                       handleDetailsClick={setDetailPage}
                     />
                   </div>
@@ -307,6 +296,9 @@ const mapDispatchToProps = (
   },
   openAppServiceModal: () => {
     dispatch(ModalActions.openAppServiceModalAction());
+  },
+  openAzureLoginModal: () => {
+    dispatch(ModalActions.openAzureLoginModalAction());
   }
 });
 
