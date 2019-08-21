@@ -35,7 +35,7 @@ interface IDispatchProps {
   setDetailPage: (detailPageInfo: IOption) => void;
   openAzureFunctionsModal: () => any;
   openAppServiceModal: () => any;
-  openAzureLoginModal: () => any;
+  openAzureLoginModal: (serviceInternalName: string) => any;
 }
 
 interface IAzureLoginProps {
@@ -141,7 +141,7 @@ class AzureSubscriptions extends React.Component<Props, IState> {
     if (modalOpeners.hasOwnProperty(internalName)) {
       return modalOpeners[internalName];
     }
-    return () => { };
+    return () => {};
   }
 
   /**
@@ -169,7 +169,6 @@ class AzureSubscriptions extends React.Component<Props, IState> {
   ) {
     const { formatMessage } = this.props.intl;
     const { openAzureLoginModal } = this.props;
-    const createdHostingServiceInternalName = this.getCreatedHostingService();
 
     return (
       <div
@@ -190,9 +189,6 @@ class AzureSubscriptions extends React.Component<Props, IState> {
               // show cards with preview flag only if wizard is also in preview
               const shouldShowCard = isPreview || !option.isPreview;
               if (shouldShowCard && option.type === type) {
-
-
-
                 return (
                   <div
                     key={JSON.stringify(option.title)}
@@ -205,9 +201,9 @@ class AzureSubscriptions extends React.Component<Props, IState> {
                       buttonText={this.addOrEditResourceText(
                         option.internalName
                       )}
-                      handleButtonClick={(isLoggedIn ? this.getServicesModalOpener(
-                        option.internalName) : openAzureLoginModal)
-                      }
+                      handleButtonClick={openAzureLoginModal(
+                        option.internalName
+                      )}
                       handleDetailsClick={setDetailPage}
                     />
                   </div>
@@ -297,8 +293,8 @@ const mapDispatchToProps = (
   openAppServiceModal: () => {
     dispatch(ModalActions.openAppServiceModalAction());
   },
-  openAzureLoginModal: () => {
-    dispatch(ModalActions.openAzureLoginModalAction());
+  openAzureLoginModal: (serviceInternalName: string) => {
+    dispatch(ModalActions.openAzureLoginModalAction(serviceInternalName));
   }
 });
 
